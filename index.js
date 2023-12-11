@@ -26,7 +26,7 @@ client.connect()
 
     const coffeeCollection = client.db('coffeeDB').collection('coffee');
 
-    app.get('/coffee', async(req, res)=>{
+    app.get('/coffee', async (req, res) => {
       const cursor = coffeeCollection.find();
       const result = await cursor.toArray();
       res.send(result);
@@ -37,7 +37,7 @@ client.connect()
     app.post('/coffee', async (req, res) => {
       const newCoffee = req.body;
       console.log(newCoffee);
-      
+
       try {
         const result = await coffeeCollection.insertOne(newCoffee);
         res.json(result);

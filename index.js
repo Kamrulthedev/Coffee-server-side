@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -32,12 +32,25 @@ client.connect()
       res.send(result);
     })
 
+    app.get('/coffee/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await coffeeCollection.findOne(query);
+      res.send(result)
+    })
+
+
+    app.delete(`/coffee/:id`, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await coffeeCollection.deleteOne(query)
+      res.send(result);
+    })
 
 
     app.post('/coffee', async (req, res) => {
       const newCoffee = req.body;
       console.log(newCoffee);
-
       try {
         const result = await coffeeCollection.insertOne(newCoffee);
         res.json(result);
@@ -46,6 +59,28 @@ client.connect()
         res.status(500).json({ error: 'Internal Server Error' });
       }
     });
+
+    app.put('/coffee/:id', async(req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const options = { upsert: true }
+      const updatedCoffee = req.body;
+      const coffee = {
+        $set: {
+          name: updatedCoffee.name,
+          supplier: updatedCoffee.supplier,
+          category: updatedCoffee.category,
+          chef: updatedCoffee.chef,
+          taste: updatedCoffee.taste,
+          details: updatedCoffee.details,
+          photo: updatedCoffee.photo
+        }
+      }
+    const result = await coffeeCollection.updateOne(filter, coffee, options)
+    res.send(result)
+    })
+
+
 
     app.get('', (req, res) => {
       res.send('Coffee making in the server');

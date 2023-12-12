@@ -25,6 +25,7 @@ client.connect()
     console.log('Connected to MongoDB');
 
     const coffeeCollection = client.db('coffeeDB').collection('coffee');
+    const userCollection = client.db('coffeeDB').collection('user');
 
     app.get('/coffee', async (req, res) => {
       const cursor = coffeeCollection.find();
@@ -80,9 +81,16 @@ client.connect()
     res.send(result)
     })
 
+    // user related apis
+    app.post('/user', async(req, res)=>{
+      const user = req.body;
+      console.log(user)
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+    })
 
 
-    app.get('', (req, res) => {
+    app.get('/', (req, res) => {
       res.send('Coffee making in the server');
     });
 
